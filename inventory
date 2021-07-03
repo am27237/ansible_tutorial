@@ -7,3 +7,6 @@ UbuntuClientSvr02
 
 [file_servers]
 UbuntuClientSvr03
+
+[workstations]
+WorkStation01
