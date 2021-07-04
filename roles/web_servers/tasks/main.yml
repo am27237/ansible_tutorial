@@ -1,28 +1,17 @@
-- name: install apache and php for Ubuntu servers
-  tags: apache,apache2,ubuntu
-  apt:
+- name: install apache and php for Web Servers
+  tags: apache,apache2,ubuntu,httpd,centos
+  package:
     name:
-      - apache2
-      - libapache2-mod-php
+      - "{{ apache_package_name }}"
+      - "{{ php_package_name }}"
     state: latest
-  when: ansible_distribution == "Ubuntu"
 
-- name: install apache and php for CentOS servers
-  tags: apache,httpd,centos
-  yum:
-    name:
-      - httpd
-      - php
-    state: latest
-  when: ansible_distribution == "CentOS"
-
-- name: start and enable httpd (CentOS)
+- name: start and enable apache
   tags: apache, httpd, centos
   service:
-    name: httpd
+    name: "{{apache_service}}"
     state: started
     enabled: yes
-  when: ansible_distribution == "CentOS"
 
 - name: copy/create default site
   tags: apache,apache2,httpd
@@ -38,14 +27,6 @@
   lineinfile:
     path: /etc/httpd/conf/httpd.conf
     regexp: '^ServerAdmin'
-    line: ServerAdmin somebody@somewhere.net
+    line: ServerAdmin somebody@somewhere.com
   when: ansible_distribution == "CentOS"
-  register: httpd
-
-- name: restart httpd (CentOS)
-  tags: apache,centos,httpd
-  service:
-    name: httpd
-    state: restarted
-  when: httpd.changed
-
+  notify: restart_apache
